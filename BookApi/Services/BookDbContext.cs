@@ -26,6 +26,7 @@ namespace BookApi.Services
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Many to Many
             modelBuilder.Entity<BookCategory>()
                 .HasKey(bc => new { bc.BookId, bc.CategoryId });
             modelBuilder.Entity<BookCategory>()

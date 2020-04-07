@@ -53,7 +53,7 @@ namespace BookApi.Controllers
         [HttpGet("{countryId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<CountryDto>))]
+        [ProducesResponseType(200, Type = typeof(CountryDto))]
         public IActionResult GetCountry(int countryId)
         {
             if (!countryRepository.CountryExist(countryId))
@@ -73,10 +73,10 @@ namespace BookApi.Controllers
             return Ok(countryDto);
         }
 
-        [HttpGet("authors/{authorId}")]
+        [HttpGet("author/{authorId}/country")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<CountryDto>))]
+        [ProducesResponseType(200, Type = typeof(CountryDto))]
         public IActionResult GetCountryOfAuthor(int authorId)
         {
             //Validate author exists
@@ -93,6 +93,38 @@ namespace BookApi.Controllers
             };
 
             return Ok(countryDto);
+        }
+
+
+        //authors
+        [HttpGet("{countryId}/authors")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<AuthorDto>))]
+        public IActionResult GetAuthorsFromCountry(int countryId)
+        {
+            if (!countryRepository.CountryExist(countryId))
+                return NotFound();
+
+            var authors = countryRepository.GetAuthorsFromCountry(countryId).ToList();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var authorDtos = new List<AuthorDto>();
+
+            foreach (var author in authors)
+            {
+                authorDtos.Add(new AuthorDto
+                {
+                    Id = author.Id,
+                    FirstName = author.FirstName,
+                    LastName = author.LastName
+                    
+                });
+            }
+
+            return Ok(authorDtos);
         }
     }
 }
