@@ -11,8 +11,8 @@ namespace BookApi.Services
         ICollection<Review> GetReviews();
         Review GetReview(int reviewId);
 
-        ICollection<Review> GetReviewsFromReviewer(int reviewerId);
-        Reviewer GetReviewerFromReview(int reviewId);
+        //ICollection<Review> GetReviewsFromReviewer(int reviewerId);
+        //Reviewer GetReviewerFromReview(int reviewId);
 
         ICollection<Review> GetReviewsFromBook(int bookId);
         Book GetBookFromReview(int reviewId);

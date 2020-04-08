@@ -14,10 +14,11 @@ namespace BookApi.Controllers
     public class ReviewsController : ControllerBase
     {
         private IReviewRepository reviewRepository { get; set; }
-
-        public ReviewsController(IReviewRepository _reviewRepository)
+        private IBookRepository bookRepository { get; set; }
+        public ReviewsController(IReviewRepository _reviewRepository, IBookRepository _bookRepository)
         {
             reviewRepository = _reviewRepository;
+            bookRepository = _bookRepository;
         }
 
         [HttpGet]
@@ -77,6 +78,8 @@ namespace BookApi.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewDto>))]
         public IActionResult GetReviewsFromBook(int bookId)
         {
+            if (!bookRepository.IsBookIdExist(bookId))
+                return NotFound();
             
             var reviews = reviewRepository.GetReviewsFromBook(bookId).ToList();
 
@@ -100,33 +103,33 @@ namespace BookApi.Controllers
         }
 
 
-        [HttpGet("reviewers/{reviewerId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewDto>))]
-        public IActionResult GetReviewsFromReviewer(int reviewerId)
-        {
+        //[HttpGet("reviewers/{reviewerId}")]
+        //[ProducesResponseType(400)]
+        //[ProducesResponseType(404)]
+        //[ProducesResponseType(200, Type = typeof(IEnumerable<ReviewDto>))]
+        //public IActionResult GetReviewsFromReviewer(int reviewerId)
+        //{
 
-            var reviews = reviewRepository.GetReviewsFromReviewer(reviewerId).ToList();
+        //    var reviews = reviewRepository.GetReviewsFromReviewer(reviewerId).ToList();
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            var reviewDtos = new List<ReviewDto>();
+        //    var reviewDtos = new List<ReviewDto>();
 
-            foreach (var review in reviews)
-            {
-                reviewDtos.Add(new ReviewDto
-                {
-                    Id = review.Id,
-                    HeadLine = review.HeadLine,
-                    Rating = review.Rating,
-                    ReviewText = review.ReviewText
-                });
-            }
+        //    foreach (var review in reviews)
+        //    {
+        //        reviewDtos.Add(new ReviewDto
+        //        {
+        //            Id = review.Id,
+        //            HeadLine = review.HeadLine,
+        //            Rating = review.Rating,
+        //            ReviewText = review.ReviewText
+        //        });
+        //    }
 
-            return Ok(reviewDtos);
-        }
+        //    return Ok(reviewDtos);
+        //}
 
 
         //Book
@@ -156,27 +159,27 @@ namespace BookApi.Controllers
         }
 
         //Reviewer
-        [HttpGet("{reviewId}/reviewer")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(200, Type = typeof(BookDto))]
-        public IActionResult GetReviewerFromReviews(int reviewId)
-        {
-            if (!reviewRepository.ReviewIdExist(reviewId))
-                return NotFound();
+        //[HttpGet("{reviewId}/reviewer")]
+        //[ProducesResponseType(400)]
+        //[ProducesResponseType(404)]
+        //[ProducesResponseType(200, Type = typeof(BookDto))]
+        //public IActionResult GetReviewerFromReviews(int reviewId)
+        //{
+        //    if (!reviewRepository.ReviewIdExist(reviewId))
+        //        return NotFound();
 
-            var reviewer = reviewRepository.GetReviewerFromReview(reviewId);
+        //    var reviewer = reviewRepository.GetReviewerFromReview(reviewId);
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            var reviewerDto = new ReviewerDto()
-            {
-                Id = reviewer.Id,
-                FirstName = reviewer.FirstName,
-                LastName = reviewer.LastName
-            };
-            return Ok(reviewerDto);
-        }
+        //    var reviewerDto = new ReviewerDto()
+        //    {
+        //        Id = reviewer.Id,
+        //        FirstName = reviewer.FirstName,
+        //        LastName = reviewer.LastName
+        //    };
+        //    return Ok(reviewerDto);
+        //}
     }
 }

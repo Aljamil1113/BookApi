@@ -13,11 +13,13 @@ namespace BookApi.Controllers
     [ApiController]
     public class ReviewersController : ControllerBase
     {
-        public IReviewerRepository reviewerRepository { get; set; }
+        private IReviewerRepository reviewerRepository { get; set; }
+        private IReviewRepository reviewRepository { get; set; }
 
-        public ReviewersController(IReviewerRepository _reviewerRepository)
+        public ReviewersController(IReviewerRepository _reviewerRepository, IReviewRepository _reviewRepository)
         {
             reviewerRepository = _reviewerRepository;
+            reviewRepository = _reviewRepository;
         }
 
         // api/Reviewers
@@ -71,13 +73,16 @@ namespace BookApi.Controllers
         }
 
 
-        [HttpGet("reviews/{reviewId}/reviewer")]
+        [HttpGet("{reviewId}/reviewer")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(ReviewerDto))]
         public IActionResult GetReviewerFromReviews(int reviewId)
         {
-            var reviewer = reviewerRepository.GetReviewer(reviewId);
+            if (!reviewRepository.ReviewIdExist(reviewId))
+                return NotFound();
+
+            var reviewer = reviewerRepository.GetReviewerFromReviews(reviewId);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

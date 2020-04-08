@@ -39,5 +39,13 @@ namespace BookApi.Services
         {
             return countryContext.Authors.Where(a => a.Id == authorId).Select(c => c.Country).FirstOrDefault();
         }
+
+        public bool IsDuplicateCountry(int countryId, string name)
+        {
+            var country = countryContext.Countries.Where(c => c.Name.Trim().ToUpper() == name.Trim().ToUpper() 
+            && c.Id != countryId).FirstOrDefault();
+
+            return country == null ? false : true;
+        }
     }
 }

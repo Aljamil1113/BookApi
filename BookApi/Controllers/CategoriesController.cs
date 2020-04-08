@@ -12,11 +12,13 @@ namespace BookApi.Controllers
     [ApiController]
     public class CategoriesController : Controller
     {
-        public ICategoryRepository categoryRepository { get; set; }
+        private ICategoryRepository categoryRepository { get; set; }
+        public IBookRepository bookRepository { get; set; }
 
-        public CategoriesController(ICategoryRepository _categoryRepository)
+        public CategoriesController(ICategoryRepository _categoryRepository, IBookRepository _bookRepository)
         {
             categoryRepository = _categoryRepository;
+            bookRepository = _bookRepository;
         }
 
         public IActionResult Index()
@@ -74,12 +76,14 @@ namespace BookApi.Controllers
         }
 
 
-        [HttpGet("book/{bookId}/categories")]
+        [HttpGet("books/{bookId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDto>))]
         public IActionResult GetCategoriesOfABook(int bookId)
         {
+            if (!bookRepository.IsBookIdExist(bookId))
+                return NotFound();
        
             var categories = categoryRepository.GetCategoriesOfABook(bookId).ToList();
 

@@ -30,20 +30,20 @@ namespace BookApi.Services
             return authorRepository.BookAuthors.Where(b => b.BookId == bookId).Select(a => a.Author).ToList();
         }
 
-        public ICollection<Author> GetAuthorsFromCountry(int countryId)
-        {
-            return authorRepository.Countries.Where(c => c.Id == countryId).SelectMany(a => a.Authors).ToList();
-        }
+        //public ICollection<Author> GetAuthorsFromCountry(int countryId)
+        //{
+        //    return authorRepository.Countries.Where(c => c.Id == countryId).SelectMany(a => a.Authors).ToList();
+        //}
 
         public ICollection<Book> GetBooksFromAuthor(int authorId)
         {
             return authorRepository.BookAuthors.Where(a => a.AuthorId == authorId).Select(b => b.Book).ToList();
         }
 
-        public Country GetCountryFromAuthor(int authorId)
-        {
-            return authorRepository.Authors.Where(a => a.Id == authorId).Select(c => c.Country).FirstOrDefault();
-        }
+        //public Country GetCountryFromAuthor(int authorId)
+        //{
+        //    return authorRepository.Authors.Where(a => a.Id == authorId).Select(c => c.Country).FirstOrDefault();
+        //}
 
         public bool IsAuthorIdExist(int authorId)
         {

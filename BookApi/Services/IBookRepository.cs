@@ -12,13 +12,18 @@ namespace BookApi.Services
         Book GetBook(int bookId);
         bool IsBookIdExist(int bookId);
 
-        Book GetBookFromReviews(int reviewId);
-        ICollection<Review> GetReviewsFromBook(int bookId);
+        Book GetBook(string bookIsbn);
+        bool IsBookExist(string bookIsbn);
+        decimal GetBookRating(int bookId);
+        bool IsDuplicateIsbn(int bookId, string bookIsbn);
 
-        ICollection<Book> GetBooksFromAuthor(int authorId);
-        ICollection<Author> GetAuthorsFromBook(int bookId);
+        //Book GetBookFromReviews(int reviewId);
+        //ICollection<Review> GetReviewsFromBook(int bookId);
 
-        ICollection<Book> GetBooksFromCategory(int categoryId);
-        ICollection<Category> GetCategoriesFromBook(int bookId);
+        //ICollection<Book> GetBooksFromAuthor(int authorId);
+        //ICollection<Author> GetAuthorsFromBook(int bookId);
+
+        //ICollection<Book> GetBooksFromCategory(int categoryId);
+        //ICollection<Category> GetCategoriesFromBook(int bookId);
     }
 }

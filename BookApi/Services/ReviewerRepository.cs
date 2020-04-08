@@ -32,8 +32,8 @@ namespace BookApi.Services
 
         public ICollection<Review> GetReviewsFromReviewer(int reviewerId)
         {
-            return ReviewerContext.Reviewers.Where(re => re.Id == reviewerId).SelectMany(r => r.Reviews).ToList();
-        }
+            return ReviewerContext.Reviews.Where(r => r.Reviewer.Id == reviewerId).ToList();
+        } 
 
         public bool IsReviewerIdExist(int reviwerId)
         {

@@ -25,10 +25,10 @@ namespace BookApi.Services
             return ReviewContext.Reviews.Where(r => r.Id == reviewId).FirstOrDefault();
         }
 
-        public Reviewer GetReviewerFromReview(int reviewId)
-        {
-            return ReviewContext.Reviews.Where(r => r.Id == reviewId).Select(r => r.Reviewer).FirstOrDefault();
-        }
+        //public Reviewer GetReviewerFromReview(int reviewId)
+        //{
+        //    return ReviewContext.Reviews.Where(r => r.Id == reviewId).Select(r => r.Reviewer).FirstOrDefault();
+        //}
 
         public ICollection<Review> GetReviews()
         {
@@ -40,10 +40,10 @@ namespace BookApi.Services
             return ReviewContext.Books.Where(b => b.Id == bookId).SelectMany(r => r.Reviews).ToList();
         }
 
-        public ICollection<Review> GetReviewsFromReviewer(int reviewerId)
-        {
-            return ReviewContext.Reviewers.Where(re => re.Id == reviewerId).SelectMany(r => r.Reviews).ToList();
-        }
+        //public ICollection<Review> GetReviewsFromReviewer(int reviewerId)
+        //{
+        //    return ReviewContext.Reviewers.Where(re => re.Id == reviewerId).SelectMany(r => r.Reviews).ToList();
+        //}
 
         public bool ReviewIdExist(int reviewId)
         {
