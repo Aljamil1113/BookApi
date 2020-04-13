@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookApi.Dtos;
+using BookApi.Model;
 using BookApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -52,7 +53,7 @@ namespace BookApi.Controllers
             return Ok(categoryDtos);
         }
 
-        [HttpGet("{categoryId}")]
+        [HttpGet("{categoryId}", Name = "GetCategory")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDto>))]
@@ -84,7 +85,7 @@ namespace BookApi.Controllers
         {
             if (!bookRepository.IsBookIdExist(bookId))
                 return NotFound();
-       
+
             var categories = categoryRepository.GetCategoriesOfABook(bookId).ToList();
 
             if (!ModelState.IsValid)
@@ -134,6 +135,106 @@ namespace BookApi.Controllers
             }
 
             return Ok(bookDtos);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(Category))]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult CreateCategory([FromBody]Category addCategory)
+        {
+            if (addCategory == null)
+                return BadRequest(ModelState);
+
+            var category = categoryRepository.GetCategories()
+                .Where(c => c.Name.Trim().ToUpper() == addCategory.Name.Trim().ToUpper()).FirstOrDefault();
+
+            if (category != null)
+            {
+                ModelState.AddModelError("", $"Category {addCategory.Name} already exits ...");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!categoryRepository.CreateCategory(addCategory))
+            {
+                ModelState.AddModelError("", $"Something wrong creating {addCategory.Name} ...");
+                return StatusCode(500, ModelState);
+            }
+
+            return CreatedAtRoute("GetCategory", new { categoryId = addCategory.Id }, addCategory);
+        }
+
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult UpdateCategory(int id, [FromBody]Category updateCategory)
+        {
+            if (updateCategory == null)
+                return BadRequest(ModelState);
+
+            if (id != updateCategory.Id)
+                return BadRequest(ModelState);
+
+            if (!categoryRepository.CategoryExist(id))
+                return NotFound();
+
+            if(categoryRepository.IsDuplicateCategory(id, updateCategory.Name))
+            {
+                ModelState.AddModelError("", $"Category {updateCategory.Name} is already existing...");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if(!categoryRepository.UpdateCategory(updateCategory))
+            {
+                ModelState.AddModelError("", $"Something went wrong updating {updateCategory.Name}...");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteCategory(int id)
+        {
+            if (!categoryRepository.CategoryExist(id))
+                return NotFound();
+
+            var categoryDelete = categoryRepository.GetCategory(id);
+
+            if(categoryRepository.GetAllBooksForCategory(id).Count() > 0)
+            {
+                ModelState.AddModelError("", $"Category {categoryDelete.Name} could not be deleted because " +
+                    $"it already used by some books");
+                return StatusCode(409, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if(!categoryRepository.DeleteCategory(categoryDelete))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting {categoryDelete.Name}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
         }
     }
 }

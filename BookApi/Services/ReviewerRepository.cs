@@ -15,6 +15,18 @@ namespace BookApi.Services
             ReviewerContext = _ReviewerContext;
         }
 
+        public bool CreateReviwer(Reviewer reviewer)
+        {
+            ReviewerContext.Add(reviewer);
+            return SaveReviewer();
+        }
+
+        public bool DeleteReviewer(Reviewer reviewer)
+        {
+            ReviewerContext.Remove(reviewer);
+            return SaveReviewer();
+        }
+
         public Reviewer GetReviewer(int reviewerId)
         {
             return ReviewerContext.Reviewers.Where(re => re.Id == reviewerId).FirstOrDefault();
@@ -38,6 +50,18 @@ namespace BookApi.Services
         public bool IsReviewerIdExist(int reviwerId)
         {
             return ReviewerContext.Reviewers.Any(re => re.Id == reviwerId);
+        }
+
+        public bool SaveReviewer()
+        {
+            var reviewer = ReviewerContext.SaveChanges();
+            return reviewer >= 0 ? true : false;
+        }
+
+        public bool UpdateReviewer(Reviewer reviewer)
+        {
+            ReviewerContext.Update(reviewer);
+            return SaveReviewer();
         }
     }
 }

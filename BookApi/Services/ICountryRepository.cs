@@ -13,7 +13,11 @@ namespace BookApi.Services
         Country GetCountryOfAnAuthor(int authorId);
         ICollection<Author> GetAuthorsFromCountry(int countryId);
         bool CountryExist(int countryId);
-
         bool IsDuplicateCountry(int countryId, string name);
+
+        bool CreateCountry(Country country);
+        bool UpdateCountry(Country country);
+        bool DeleteCountry(Country country);
+        bool SaveCountry();
     }
 }

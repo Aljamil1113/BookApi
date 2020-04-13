@@ -15,6 +15,36 @@ namespace BookApi.Services
             bookContext = _bookContext;
         }
 
+        public bool CreateBook(List<int> authorsId, List<int> categoriesId, Book book)
+        {
+            var authors = bookContext.Authors.Where(a => authorsId.Contains(a.Id)).ToList();
+            var categories = bookContext.Categories.Where(c => categoriesId.Contains(c.Id)).ToList();
+
+            foreach (var author in authors)
+            {
+                var bookAuthor = new BookAuthor()
+                {
+                    Author = author,
+                    Book = book
+                };
+                bookContext.Add(bookAuthor);
+            }
+
+            foreach (var category in categories)
+            {
+                var bookCategory = new BookCategory()
+                {
+                    Category = category,
+                    Book = book
+                };
+                bookContext.Add(category);
+            }
+
+            bookContext.Add(book);
+
+            return SaveBook();
+        }
+
         public Book GetBook(int bookId)
         {
             return bookContext.Books.Where(b => b.Id == bookId).FirstOrDefault();
@@ -57,6 +87,53 @@ namespace BookApi.Services
 
             return book == null ? false : true;
         }
+
+        public bool RemoveBook(Book book)
+        {
+            bookContext.Remove(book);
+            return SaveBook();
+        }
+
+        public bool SaveBook()
+        {
+            var book = bookContext.SaveChanges();
+            return book >= 0 ? true : false;
+        }
+
+        public bool UpdateBook(List<int> authorsId, List<int> categoriesId,Book book)
+        {
+            var authors = bookContext.Authors.Where(a => authorsId.Contains(a.Id)).ToList();
+            var categories = bookContext.Categories.Where(c => categoriesId.Contains(c.Id)).ToList();
+
+            var authorsToDelete = bookContext.BookAuthors.Where(b => b.BookId == book.Id);
+            var categoriesToDelete = bookContext.BookCategories.Where(b => b.BookId == book.Id);
+
+            bookContext.RemoveRange(authorsToDelete);
+            bookContext.RemoveRange(categoriesToDelete);
+
+            foreach (var author in authors)
+            {
+                var bookAuthor = new BookAuthor()
+                {
+                    Author = author,
+                    Book = book
+                };
+                bookContext.Add(bookAuthor);
+            }
+
+            foreach (var category in categories)
+            {
+                var bookCategory = new BookCategory()
+                {
+                    Category = category,
+                    Book = book
+                };
+                bookContext.Add(category);
+            }
+
+            bookContext.Update(book);
+            return SaveBook();
+        }        
 
         //public ICollection<Author> GetAuthorsFromBook(int bookId)
         //{

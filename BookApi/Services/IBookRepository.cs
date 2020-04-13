@@ -25,5 +25,10 @@ namespace BookApi.Services
 
         //ICollection<Book> GetBooksFromCategory(int categoryId);
         //ICollection<Category> GetCategoriesFromBook(int bookId);
+
+        bool CreateBook(List<int> authorsId, List<int> categoriesId, Book book);
+        bool UpdateBook(List<int> authorsId, List<int> categoriesId,Book book);
+        bool RemoveBook(Book book);
+        bool SaveBook();
     }
 }

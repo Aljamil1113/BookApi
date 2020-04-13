@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookApi.Dtos;
+using BookApi.Model;
 using BookApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -52,7 +53,7 @@ namespace BookApi.Controllers
         }
 
         // api/countries/countryId
-        [HttpGet("{countryId}")]
+        [HttpGet("{countryId}", Name = "GetCountry")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(CountryDto))]
@@ -129,6 +130,107 @@ namespace BookApi.Controllers
             }
 
             return Ok(authorDtos);
+        }
+
+        //POST api/countries
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(Country))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult CreateCountry([FromBody]Country countryToCreate)
+        {
+            if (countryToCreate == null)
+                return BadRequest(ModelState);
+
+            var country = countryRepository.GetCountries()
+                .Where(c => c.Name.Trim().ToUpper() == countryToCreate.Name.Trim().ToUpper()).FirstOrDefault();
+
+            if(country != null)
+            {
+                ModelState.AddModelError("", $"Country {countryToCreate.Name} already exists...");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if(!countryRepository.CreateCountry(countryToCreate))
+            {
+                ModelState.AddModelError("", $"Something wrong on saving {countryToCreate.Name}");
+                return StatusCode(500, ModelState);
+            }
+
+            return CreatedAtRoute("GetCountry", new { countryId = countryToCreate.Id }, countryToCreate);
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult UpdateCountry(int id, [FromBody]Country updateCountry)
+        {
+            if (updateCountry == null)
+                return BadRequest(ModelState);
+
+            if (id != updateCountry.Id)
+                return BadRequest(ModelState);           
+
+            if (!countryRepository.CountryExist(id))
+                return NotFound();
+
+            if (countryRepository.IsDuplicateCountry(id, updateCountry.Name))
+            {
+                ModelState.AddModelError("", $"Country {updateCountry.Name} already exists...");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            if (!countryRepository.UpdateCountry(updateCountry))
+            {
+                ModelState.AddModelError("", $"Something wrong on updating {updateCountry.Name}");
+                return StatusCode(500, ModelState);
+            }
+               
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteCountry(int id)
+        {
+            if (!countryRepository.CountryExist(id))
+                return NotFound();
+
+            var countryToDelete = countryRepository.GetCountry(id);
+
+            if(countryRepository.GetAuthorsFromCountry(id).Count() > 0)
+            {
+                ModelState.AddModelError("", $"Country {countryToDelete.Name} is" +
+                    $" already use by some authors");
+
+                return StatusCode(409, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!countryRepository.DeleteCountry(countryToDelete))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting {countryToDelete.Name}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
         }
     }
 }

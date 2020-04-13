@@ -10,10 +10,15 @@ namespace BookApi.Services
     {
         ICollection<Reviewer> GetReviewers();
         Reviewer GetReviewer(int reviewerId);
-
         Reviewer GetReviewerFromReviews(int reviewId);
         ICollection<Review> GetReviewsFromReviewer(int reviewerId);
 
         bool IsReviewerIdExist(int reviewerId);
+
+
+        bool CreateReviwer(Reviewer reviewer);
+        bool UpdateReviewer(Reviewer reviewer);
+        bool DeleteReviewer(Reviewer reviewer);
+        bool SaveReviewer();
     }
 }
