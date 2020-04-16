@@ -361,7 +361,6 @@ namespace BookApi.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(422)]
         [ProducesResponseType(500)]
         public IActionResult UpdateBook(int bookId, [FromQuery] List<int> authId, [FromQuery] List<int> catId,
                                         [FromBody] Book bookToUpdate)

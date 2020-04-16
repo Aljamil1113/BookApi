@@ -37,7 +37,7 @@ namespace BookApi.Services
                     Category = category,
                     Book = book
                 };
-                bookContext.Add(category);
+                bookContext.Add(bookCategory);
             }
 
             bookContext.Add(book);
@@ -128,7 +128,7 @@ namespace BookApi.Services
                     Category = category,
                     Book = book
                 };
-                bookContext.Add(category);
+                bookContext.Add(bookCategory);
             }
 
             bookContext.Update(book);
